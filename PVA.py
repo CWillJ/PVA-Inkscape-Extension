@@ -2578,9 +2578,6 @@ class path_gcode(inkex.Effect):
 
 
         def new_end_point(vod, s, e1):
-            print_("Start  :", s)
-            print_("Old End:", e1)
-
             v,u,e2 = [0,0], [0,0], [0,0]
 
             v[0] = e1[0] - s[0]
