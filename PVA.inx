@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+   <_name>PVA Gcode Generator</_name>
+   <id>PVA.layer_dispense</id>
+	<dependency type="executable" location="extensions">PVA.py</dependency>
+	<dependency type="executable" location="extensions">inkex.py</dependency>
+
+   <param name="active-tab" type="notebook">
+
+      <!-- Build Tab -->
+      <page name="build" _gui-text="Build Path">
+         <_param name="build-help" type="description" xml:space="preserve">Builds the gcode file. Each active layer will need layer settings and each selected object will need it's settings set before the gcode file can be built.</_param>
+
+         <param name="dry-mode" type="boolean" _gui-text="Dry Mode">false</param>
+
+         <param name="directory" type="string" _gui-text="Directory:"></param>
+         <param name="filename" type="string" _gui-text="Filename:">output.gcode</param>
+         <param name="add-numeric-suffix-to-filename" type="boolean" _gui-text="Add numeric suffix to filename">true</param>
+
+         <param name="create-log" type="boolean" _gui-text="Enable Logging">true</param>
+         <param name="log-filename" type="string" _gui-text="Log File:">C:\Users\wjohnson\Documents\PVA Inkscape\Log\log_file.txt</param>
+      </page>
+
+      <!-- Layer Settings Tab -->
+      <page name="layer-settings" _gui-text="Layer Settings">
+         <_param name="layer-help" type="description" xml:space="preserve">Applies the following settings to the selected layer.</_param>
+         <param name="layer-action" type="enum" _gui-text="Action">
+            <_item value="layer-set">Set Layer Settings</_item>
+            <_item value="layer-display">Display Layer Settings</_item>
+            <_item value="layer-hide">Hide Layer Settings</_item>
+            <_item value="layer-import">Import Layer Settings From Displayed</_item>
+         </param>
+         <param name="layer-travel-speed" type="float" precision="4" min="0" max="20000" _gui-text="Travel Speed (mm/min or in/min):">3000</param>
+         <param name="layer-safe-z" type="float" precision="4" min="0" max="15000" _gui-text="Safe Z Height (mm/in)">0</param>	
+      </page>
+
+      <!-- Dispense Objects Tab -->
+      <page name="path-settings" _gui-text="Path Object Settings">
+         <_param name="path-help" type="description" xml:space="preserve">Applies the following settings to the selected path object(s). Leaving the ID blank will apply the settings and leave the ID unchanged.</_param>
+         <param name="po-id" type="string" _gui-text="Unique ID"></param>
+         <param name="tool" type="string" _gui-text="Tool">T0</param>
+         <param name="dispense-height" type="float" precision="4" min="0" max="15000" _gui-text="Dispense Height (mm/in)">0</param>	
+         <_param name="line-settings" type="description" xml:space="preserve">Line Specific Settings:</_param>
+         <param name="dispense-speed" type="float" precision="4" min="0" max="20000" _gui-text="Dispense Speed (mm/min or in/min):">750</param>
+         <param name="valve-off-distance" type="float" precision="4" min="0" max="10" _gui-text="Valve Off Distance (mm)">0</param>	
+         <param name="valve-delay" type="float" precision="4" min="0" max="10000" _gui-text="Valve Delay (ms)">0</param>
+         <_param name="dot-settings" type="description" xml:space="preserve">Dot Specific Settings:</_param>
+         <param name="dispense-time" type="float" precision="4" min="0" max="10000" _gui-text="Dispense Dot Time (ms)">250</param>
+      </page>
+
+      <!-- Help/Description Tab -->
+      <page name="pva-help" _gui-text="Help">
+         <_param name="help_text" type="description" xml:space="preserve">Dispense Dots:
+This plugin will allow you to use circle and ellipse objects as dispense dots where the center of the circle/ellipse will be your dot location. You can apply settings to circle/ellipse objects in the Path Object Settings tab.
+   </_param>
+      </page>
+
+   </param>
+
+   <effect needs-document="true" needs-live-preview="false">
+		<effects-menu>
+			<submenu _name="PVA"/>
+		</effects-menu>
+		<object-type>all</object-type>
+  	</effect>
+
+	<script>
+		<command reldir="extensions" interpreter="python">PVA.py</command>
+	</script>
+
+</inkscape-extension>
