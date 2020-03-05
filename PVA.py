@@ -2551,9 +2551,17 @@ class path_gcode(inkex.Effect):
         layer_set = self.get_layer_settings(layer)
         depth = float(layer_set['Safe Z'])
         tool = 'T0'
-        dry = ';' if self.options.dry_mode else ''
         g = ""
         vod = 0 
+
+        if self.options.dry_mode:
+            dry = ';'
+            tool_on = ' P0'
+        else:
+            dry = ''
+            tool_on = ' P255'
+
+        tool_off = ' P0'
 
         print_("gc LAYER:",layer)
         print_("gc CURVE:",curve)
@@ -2591,12 +2599,6 @@ class path_gcode(inkex.Effect):
             e2[0] = e1[0] - vod * u[0]
             e2[1] = e1[1] - vod * u[1]
 
-            # print_("Start  : (", s[0], s[1], ")")
-            # print_("Old End: (", e1[0], e1[1], ")")
-            # print_("New End: (", e2[0], e2[1], ")")
-            # print_("distance 1:", vod)
-            # print_("distance 2:", math.sqrt((e2[0] - e1[0])**2 + (e2[1] - e1[1])**2))
-
             return e2
 
 
@@ -2607,7 +2609,7 @@ class path_gcode(inkex.Effect):
 
         lg, zs =  'G00', float(layer_set['Safe Z']) 
         current_a = 0
-        go_to_safe_distance = "G00" + c([None,None,zs]) 
+        go_to_safe_distance = "G00" + tool_off + c([None,None,zs]) 
         travel_speed = " F %s"%float(layer_set['Travel Speed'])
         start_point = [0,0]
 
@@ -2635,46 +2637,51 @@ class path_gcode(inkex.Effect):
             if s[1] == 'move':
                 # print_("Curve i:",curve[i])
                 g += ";Starting Path id: " + path[j].get('id') + "\n"
-                g += tool + "\n" + go_to_safe_distance + travel_speed + "\n" + "G00" + c(si[0]) + "\n"
+                g += tool + "\n" + go_to_safe_distance + travel_speed + "\n"
+                g += "G00" + tool_off + c(si[0]) + "\n"
                 lg = 'G00'
                 start_point = si[0]
 
             elif s[1] == 'end':
-                g += '\n' + dry + 'M98 P"' + tool + '_OFF.G" ;Tool Off\n' + go_to_safe_distance + travel_speed + "\n\n"
+                g += go_to_safe_distance + travel_speed + "\n\n"
                 lg = 'G00'
                 j += 1
 
             elif s[1] == 'line':
                 if lg == "G00":
-                    g += "G01" + c([None,None,s[5][0]+depth]) + travel_speed + " ;Penetrate\n\n"
-                    g += dry + 'M98 P"' + tool + '_ON.G" ;Tool On\nG04 P' + path[j].get('valve_delay') + " ;Valve Delay ms\n\n"
+                    g += "G01" + tool_off + c([None,None,s[5][0]+depth]) + travel_speed + " ;Penetrate\n\n"
+                    g += dry + 'M98 P"' + tool + '_ON.G" ;Tool On\n'
+                    g += 'G04 P' + path[j].get('valve_delay') + " ;Valve Delay ms\n\n"
                 elif curve[i][1] != 'end':
                     start_point = si[0]
 
                 # Valve Off Distance
                 if curve[i][1] == 'end' and vod > 0:
                     g += ";Valve Off Distance: " + str(vod) + " mm\n"
-                    g += "G01" + c(new_end_point(vod,start_point,si[0])+[s[5][1]+depth]) + dispense_speed + "\n"
-                    g += dry + 'M98 P"' + tool + '_OFF.G" ;Tool Off\n'
+                    g += "G01" + tool_on + c(new_end_point(vod,start_point,si[0])+[s[5][1]+depth]) + dispense_speed + "\n"
 
-                g += "G01" + c(si[0]+[s[5][1]+depth]) + dispense_speed + "\n"
-                lg = 'G01'
+                if lg == "G00":
+                    g += "G01" + tool_off + c(si[0]+[s[5][1]+depth]) + dispense_speed + "\n"
+                else:
+                    g += "G01" + tool_on + c(si[0]+[s[5][1]+depth]) + dispense_speed + "\n"
+                    lg = 'G01'
 
             elif s[1] == 'arc':
                 r = [(s[2][0]-s[0][0]), (s[2][1]-s[0][1])]
                 if lg == "G00":
                     g += "G01" + c([None,None,s[5][0]+depth]) + travel_speed + " ;Penetrate\n\n"
-                    g += dry + 'M98 P"' + tool + '_ON.G" ;Tool On\nG04 P' + path[j].get('valve_delay') + " ;Valve Delay ms\n\n"
+                    g += dry + 'M98 P"' + tool + '_ON.G" ;Tool On\n'
+                    g += 'G04 P' + path[j].get('valve_delay') + " ;Valve Delay ms\n\n"
                 if (r[0]**2 + r[1]**2)>.1 : # self.options.min_arc_radius**2:
                     r1, r2 = (P(s[0])-P(s[2])), (P(si[0])-P(s[2]))
                     if abs(r1.mag()-r2.mag()) < 0.001 :
-                        g += ("G02" if s[3]<0 else "G03") + c(si[0]+[ s[5][1]+depth, (s[2][0]-s[0][0]),(s[2][1]-s[0][1])  ]) + dispense_speed + "\n"
+                        g += ("G02" if s[3]<0 else "G03") + tool_on + c(si[0]+[ s[5][1]+depth, (s[2][0]-s[0][0]),(s[2][1]-s[0][1])  ]) + dispense_speed + "\n"
                     else:
                         r = (r1.mag()+r2.mag())/2
-                        g += ("G02" if s[3]<0 else "G03") + c(si[0]+[s[5][1]+depth]) + " R%f" % (r) + dispense_speed  + "\n"
+                        g += ("G02" if s[3]<0 else "G03") + tool_on + c(si[0]+[s[5][1]+depth]) + " R%f" % (r) + dispense_speed  + "\n"
                     lg = 'G02'
                 else:
-                    g += "G01" + c(si[0]+[s[5][1]+depth]) + dispense_speed + "\n"
+                    g += "G01" + tool_on + c(si[0]+[s[5][1]+depth]) + dispense_speed + "\n"
                     lg = 'G01'
 
             elif s[1] == 'dot':
@@ -2684,19 +2691,19 @@ class path_gcode(inkex.Effect):
                 g += go_to_safe_distance + travel_speed + '\n'
 
                 # go to the X, Y location of dot
-                g += 'G01 '
-                g += 'X ' + str(s[0][0]) + ' Y ' + str(s[0][1]) + travel_speed + '\n'
+                g += 'G01' + tool_off
+                g += ' X ' + str(s[0][0]) + ' Y ' + str(s[0][1]) + travel_speed + '\n'
 
                 # go to the dispense height
-                g += 'G01 '
-                g += 'Z ' + str(depth) + travel_speed + '\n'
+                g += 'G01' + tool_off
+                g += ' Z ' + str(depth) + travel_speed + '\n'
 
                 # turn tool on, dwell for dot dispense time
                 g += dry + 'M98 P"' + tool + '_ON.G" ;Tool On\n'
                 g += 'G04 P' + path[j].get('dispense_time') + ' ;Dot Dispense Time ms\n'
 
         if si[1] == 'end':
-            g += '\n' + dry + 'M98 P"' + tool + '_OFF.G" ;Tool Off\n' + go_to_safe_distance + travel_speed + "\n\n"
+            g += '\n' + go_to_safe_distance + travel_speed + "\n\n"
 
         return g
 
