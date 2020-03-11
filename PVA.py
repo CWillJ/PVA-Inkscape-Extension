@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-PVA Extension
+PVA Gcode Generator
 Version: 0.1.1
-Date Modified: 03/11/2020
+Last Updated: 03/11/2020
 
 Modified by C. Will Johnson 2019, PVA
 Modified by Jay Johnson 2015, J Tech Photonics, Inc., jtechphotonics.com
@@ -46,6 +46,9 @@ import codecs
 import random
 import gettext
 _ = gettext.gettext
+
+
+__version__ = '0.1.1'
 
 
 ### Check if inkex has errormsg (0.46 version doesnot have one.) Could be removed later.
@@ -3538,7 +3541,7 @@ class path_gcode(inkex.Effect):
             try :
                 if os.path.isfile(self.options.log_filename) : os.remove(self.options.log_filename)
                 f = open(self.options.log_filename,"a")
-                f.write("Gcodetools log file\nStarted at %s\n%s\n" % (time.strftime("%d.%m.%Y %H:%M:%S"),options.log_filename))
+                f.write("PVA Inkscape Extension log file\nVersion: " + __version__ + "\nStarted at %s\n%s\n" % (time.strftime("%d.%m.%Y %H:%M:%S"),options.log_filename))
                 f.write("%s tab is active\n" % self.options.active_tab)
                 f.close()
             except :
