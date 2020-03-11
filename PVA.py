@@ -2269,13 +2269,12 @@ class Polygon:
 class path_gcode(inkex.Effect):
 
     def export_gcode(self,gcode):
-        # gcode_pass = gcode
-        # for x in range(1,self.options.passes):
-        # gcode += "G91\nG01 Z" + str(self.options.safe_z) + "\nG90\n"
-        # Safe Z
-        # gcode += "G01 X 0 Y 0 Z " + ("%f" % self.options.safe_z) + " F " + ("%f" % self.options.travel_speed) + "\n"
+        build_header =  ";PVA Gcode Generator\n"
+        build_header += ";Version: " + __version__ + "\n"
+        build_header += ";Date: %s" % time.strftime("%d/%m/%Y  Time: %H:%M:%S") + "\n\n"
+
         f = open(self.options.directory+self.options.file, "w")
-        f.write(self.header + "\n" + gcode + self.footer)
+        f.write(build_header + self.header + "\n" + gcode + self.footer)
         f.close()
 
     def __init__(self):
@@ -2308,6 +2307,7 @@ class path_gcode(inkex.Effect):
         self.OptionParser.add_option("",   "--valve-delay",                     action="store", type="float",           dest="valve_delay",                         default="255",                      help="Delay before valve turns on (ms)")
         self.OptionParser.add_option("",   "--valve-off-distance",              action="store", type="float",           dest="valve_off_distance",                  default="0",                        help="The distance before the end point that the tool will turn off")
         self.OptionParser.add_option("",   "--dispense-time",                   action="store", type="float",           dest="dispense_time",                       default="500",                      help="Length of Dot Dispense (ms) applied to selected circles/ellipses")
+        self.OptionParser.add_option("",   "--post-dot-dwell",                  action="store", type="float",           dest="post_dot_dwell",                      default="500",                      help="Length of post dot dwell (ms) applied to selected circles/ellipses")
 
         self.layer_settings_field_order = [
                     'Layer Name',
@@ -2328,6 +2328,7 @@ class path_gcode(inkex.Effect):
                     'Dot ID',
                     'Tool',
                     'Dispense Time',
+                    'Post Dot Dwell',
                     'Dispense Height',
                 ]
 
@@ -2692,8 +2693,8 @@ class path_gcode(inkex.Effect):
                     lg = 'G01'
 
             elif s[1] == 'dot':
-                print_("cx:",path[j].get('cx'),"cy:",path[j].get('cy'))
-                print_("X:",s[0][0],"Y",s[0][1])
+                # print_("cx:",path[j].get('cx'),"cy:",path[j].get('cy'))
+                # print_("X:",s[0][0],"Y",s[0][1])
                 g += ';Starting Dot id: ' + path[j].get('id') + '\n' + tool + '\n'
                 g += go_to_safe_distance + travel_speed + '\n'
 
@@ -2708,6 +2709,10 @@ class path_gcode(inkex.Effect):
                 # turn tool on, dwell for dot dispense time
                 g += dry + 'M98 P"' + tool + '_ON.G" ;Tool On\n'
                 g += 'G04 P' + path[j].get('dispense_time') + ' ;Dot Dispense Time ms\n'
+
+                # tool off and post dot dwell
+                g += dry + 'M98 P"' + tool + '_OFF.G" ;Tool Off\n'
+                g += 'G04 P' + path[j].get('post_dot_dwell') + ' ;Post Dot Dwell ms\n'
 
         if si[1] == 'end':
             g += '\n' + go_to_safe_distance + travel_speed + "\n\n"
@@ -2994,6 +2999,7 @@ class path_gcode(inkex.Effect):
                     "Dot ID": l.get("id"),
                     "Tool": l.get("tool"),
                     "Dispense Time": l.get("dispense_time"),
+                    "Post Dot Dwell": l.get("post_dot_dwell"),
                     "Dispense Height": l.get("dispense_height"),
                 }
 
@@ -3157,6 +3163,7 @@ class path_gcode(inkex.Effect):
                 # settings for dot objects only
                 if self.is_dot(path_object):
                     path_object.set('dispense_time', str(round(self.options.dispense_time,prec)))   # set dot dispense time
+                    path_object.set('post_dot_dwell', str(round(self.options.post_dot_dwell,prec))) # set post dot dwell
 
                 # settings for line objects only
                 else:
@@ -3177,6 +3184,7 @@ class path_gcode(inkex.Effect):
                 'ID': po.get('id'),
                 'Tool': po.get('tool'),
                 'Dispense Time': po.get('dispense_time'),
+                'Post Dot Dwell': po.get('post_dot_dwell'),
                 'Dispense Height': po.get('dispense_height'),
             }
         # po is a line or curve. will apply dispense line settings
@@ -3541,7 +3549,7 @@ class path_gcode(inkex.Effect):
             try :
                 if os.path.isfile(self.options.log_filename) : os.remove(self.options.log_filename)
                 f = open(self.options.log_filename,"a")
-                f.write("PVA Inkscape Extension log file\nVersion: " + __version__ + "\nStarted at %s\n%s\n" % (time.strftime("%d.%m.%Y %H:%M:%S"),options.log_filename))
+                f.write("PVA Gcode Generator log file\nVersion: " + __version__ + "\nStarted at %s\n%s\n" % (time.strftime("%d.%m.%Y %H:%M:%S"),options.log_filename))
                 f.write("%s tab is active\n" % self.options.active_tab)
                 f.close()
             except :

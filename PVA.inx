@@ -45,7 +45,8 @@
          <param name="valve-off-distance" type="float" precision="4" min="0" max="10" _gui-text="Valve Off Distance (mm)">0</param>	
          <param name="valve-delay" type="float" precision="4" min="0" max="10000" _gui-text="Valve Delay (ms)">0</param>
          <_param name="dot-settings" type="description" xml:space="preserve">Dot Specific Settings:</_param>
-         <param name="dispense-time" type="float" precision="4" min="0" max="10000" _gui-text="Dispense Dot Time (ms)">250</param>
+         <param name="dispense-time" type="float" precision="4" min="0" max="10000" _gui-text="Dispense Dot Time (ms)">500</param>
+         <param name="post-dot-dwell" type="float" precision="4" min="0" max="10000" _gui-text="Post Dot Dwell (ms)">500</param>
       </page>
 
       <!-- Help/Description Tab -->
