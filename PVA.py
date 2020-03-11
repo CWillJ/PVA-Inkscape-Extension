@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 """
+PVA Extension
+Version: 0.1.1
+Date Modified: 03/11/2020
+
 Modified by C. Will Johnson 2019, PVA
 Modified by Jay Johnson 2015, J Tech Photonics, Inc., jtechphotonics.com
 modified by Adam Polak 2014, polakiumengineering.org
