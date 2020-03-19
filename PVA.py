@@ -48,7 +48,7 @@ import gettext
 _ = gettext.gettext
 
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 
 ### Check if inkex has errormsg (0.46 version doesnot have one.) Could be removed later.
@@ -2660,19 +2660,21 @@ class path_gcode(inkex.Effect):
                     g += "G01" + tool_off + c([None,None,s[5][0]+depth]) + travel_speed + " ;Penetrate\n\n"
                     g += dry + 'M98 P"' + tool + '_ON.G" ;Tool On\n'
                     g += 'G04 P' + path[j].get('valve_delay') + " ;Valve Delay ms\n\n"
-                elif curve[i][1] != 'end':
+
+                if curve[i][1] != 'end':
                     start_point = si[0]
 
                 # Valve Off Distance
                 if curve[i][1] == 'end' and vod > 0:
                     g += ";Valve Off Distance: " + str(vod) + " mm\n"
                     g += "G01" + tool_on + c(new_end_point(vod,start_point,si[0])+[s[5][1]+depth]) + dispense_speed + "\n"
-
-                if lg == "G00":
                     g += "G01" + tool_off + c(si[0]+[s[5][1]+depth]) + dispense_speed + "\n"
                 else:
-                    g += "G01" + tool_on + c(si[0]+[s[5][1]+depth]) + dispense_speed + "\n"
-                    lg = 'G01'
+                    if lg == "G00":
+                        g += "G01" + tool_on + c(si[0]+[s[5][1]+depth]) + dispense_speed + "\n"
+                        lg = 'G01'
+                    else:
+                        g += "G01" + tool_on + c(si[0]+[s[5][1]+depth]) + dispense_speed + "\n"
 
             elif s[1] == 'arc':
                 r = [(s[2][0]-s[0][0]), (s[2][1]-s[0][1])]
@@ -3053,6 +3055,10 @@ class path_gcode(inkex.Effect):
 ################################################################################
     def import_layer_settings(self, layer=None):
         layer = self.current_layer if self.current_layer is not None or layer == None else self.document.getroot()
+
+        if layer.get(inkex.addNS('label','inkscape')) == None:
+            self.error(_("Layer settings cannot be applied to %s layer." %layer.get(inkex.addNS('label','inkscape'))),"error")
+
         ls_element = self.getElementById(self.remove_spaces(layer.get(inkex.addNS('label','inkscape'))) + '_' + 'Layer_Settings')
 
         if ls_element == None:
