@@ -48,7 +48,7 @@ import gettext
 _ = gettext.gettext
 
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 
 ### Check if inkex has errormsg (0.46 version doesnot have one.) Could be removed later.

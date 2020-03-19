@@ -53,8 +53,8 @@
       <page name="pva-about" _gui-text="About">
          <_param name="help_text" type="description" xml:space="preserve">
 PVA Gcode Generator
-Version: 0.1.1
-Last Updated: 03/11/2020
+Version: 0.1.2
+Last Updated: 03/19/2020
 
 www.pva.net
          </_param>
