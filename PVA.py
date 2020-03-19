@@ -3053,6 +3053,10 @@ class path_gcode(inkex.Effect):
 ################################################################################
     def import_layer_settings(self, layer=None):
         layer = self.current_layer if self.current_layer is not None or layer == None else self.document.getroot()
+
+        if layer.get(inkex.addNS('label','inkscape')) == None:
+            self.error(_("Layer settings cannot be applied to %s layer." %layer.get(inkex.addNS('label','inkscape'))),"error")
+
         ls_element = self.getElementById(self.remove_spaces(layer.get(inkex.addNS('label','inkscape'))) + '_' + 'Layer_Settings')
 
         if ls_element == None:
