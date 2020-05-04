@@ -17,8 +17,8 @@
          <param name="filename" type="string" _gui-text="Filename:">output.gcode</param>
          <param name="add-numeric-suffix-to-filename" type="boolean" _gui-text="Add numeric suffix to filename">true</param>
 
-         <param name="create-log" type="boolean" _gui-text="Enable Logging">true</param>
-         <param name="log-filename" type="string" _gui-text="Log File:">C:\Users\wjohnson\Documents\PVA Inkscape\Log\log_file.txt</param>
+         <!-- <param name="create-log" type="boolean" _gui-text="Enable Logging">false</param> -->
+         <!-- <param name="log-filename" type="string" _gui-text="Log File:">C:\Program Files (x86)\Inkscape\Log\log.txt</param> -->
       </page>
 
       <!-- Layer Settings Tab -->
@@ -53,9 +53,11 @@
       <page name="pva-about" _gui-text="About">
          <_param name="help_text" type="description" xml:space="preserve">
 PVA Gcode Generator
-Version: 0.1.2
-Last Updated: 03/19/2020
+Version: 1.0.0
+Last Updated: 05/05/2020
 
+
+PVA Contact Information
 www.pva.net
          </_param>
       </page>
