@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
 PVA Gcode Generator
-Version: 0.1.1
-Last Updated: 03/11/2020
+Version: 1.0.0
+Last Updated: 05/05/2020
 
 Modified by C. Will Johnson 2019, PVA
 Modified by Jay Johnson 2015, J Tech Photonics, Inc., jtechphotonics.com
@@ -48,7 +48,7 @@ import gettext
 _ = gettext.gettext
 
 
-__version__ = '0.1.2'
+__version__ = '1.0.0'
 
 
 ### Check if inkex has errormsg (0.46 version doesnot have one.) Could be removed later.
@@ -2271,7 +2271,7 @@ class path_gcode(inkex.Effect):
     def export_gcode(self,gcode):
         build_header =  ";PVA Gcode Generator\n"
         build_header += ";Version: " + __version__ + "\n"
-        build_header += ";Date: %s" % time.strftime("%d/%m/%Y  Time: %H:%M:%S") + "\n\n"
+        build_header += ";Date: %s" % time.strftime("%m/%d/%Y  Time: %H:%M:%S") + "\n\n"
 
         f = open(self.options.directory+self.options.file, "w")
         f.write(build_header + self.header + "\n" + gcode + self.footer)
@@ -2292,7 +2292,7 @@ class path_gcode(inkex.Effect):
         self.OptionParser.add_option("-f", "--filename",                        action="store", type="string",          dest="file",                                default="output.gcode",             help="File name")
         self.OptionParser.add_option("",   "--add-numeric-suffix-to-filename",  action="store", type="inkbool",         dest="add_numeric_suffix_to_filename",      default=False,                      help="Add numeric suffix to file name")
         self.OptionParser.add_option("",   "--create-log",                      action="store", type="inkbool",         dest="log_create_log",                      default=False,                      help="Create log files")
-        self.OptionParser.add_option("",   "--log-filename",                    action="store", type="string",          dest="log_filename",                        default="C:",                       help="Create log files")
+        self.OptionParser.add_option("",   "--log-filename",                    action="store", type="string",          dest="log_filename",                        default="C:\Program Files (x86)\Inkscape\Log\log.txt", help="Create log files")
 
         # Layer Settings Tab
         self.OptionParser.add_option("",   "--layer-action",                    action="store", type="string",          dest="layer_action",                        default="Set Layer Settings",       help="Select 'set layer settings' to apply settings to current layer. Select 'display layer settings to display layer settings and objects within that layer's settings. Select 'hide layer settings' to hide the box of layer settings")
@@ -2517,22 +2517,26 @@ class path_gcode(inkex.Effect):
             self.error(_("Directory does not exist! Please specify existing directory at options tab!"),"error")
             return False
 
+        dir_list = os.listdir(self.options.directory)
+        if "." in self.options.file :
+            r = re.match(r"^(.*)(\..*)$",self.options.file)
+            ext = r.group(2)
+            name = r.group(1)
+        else:
+            ext = ".gcode"
+            name = self.options.file
+
+        filename = name + ext
+
         if self.options.add_numeric_suffix_to_filename :
-            dir_list = os.listdir(self.options.directory)
-            if "." in self.options.file :
-                r = re.match(r"^(.*)(\..*)$",self.options.file)
-                ext = r.group(2)
-                name = r.group(1)
-            else:
-                ext = ""
-                name = self.options.file
             max_n = 0
             for s in dir_list :
                 r = re.match(r"^%s_0*(\d+)%s$"%(re.escape(name),re.escape(ext) ), s)
                 if r :
                     max_n = max(max_n,int(r.group(1)))
             filename = name + "_" + ( "0"*(4-len(str(max_n+1))) + str(max_n+1) ) + ext
-            self.options.file = filename
+
+        self.options.file = filename
 
         print_("Testing writing rights on '%s'"%(self.options.directory+self.options.file))
         try:
