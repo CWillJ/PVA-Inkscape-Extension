@@ -2304,7 +2304,7 @@ class path_gcode(inkex.Effect):
         self.OptionParser.add_option("",   "--tool",                            action="store", type="string",          dest="tool",                                default="T0",                       help="Selected tool")
         self.OptionParser.add_option("",   "--dispense-height",                 action="store", type="float",           dest="dispense_height",                     default="0",                        help="Dispense Z height")
         self.OptionParser.add_option("",   "--dispense-speed",                  action="store", type="float",           dest="dispense_speed",                      default="750",                      help="Dispense speed (mm/min)")
-        self.OptionParser.add_option("",   "--valve-delay",                     action="store", type="float",           dest="valve_delay",                         default="255",                      help="Delay before valve turns on (ms)")
+        self.OptionParser.add_option("",   "--valve-on-time",                   action="store", type="float",           dest="valve_on_time",                       default="255",                      help="Delay before valve turns on (ms)")
         self.OptionParser.add_option("",   "--valve-off-distance",              action="store", type="float",           dest="valve_off_distance",                  default="0",                        help="The distance before the end point that the tool will turn off")
         self.OptionParser.add_option("",   "--dispense-time",                   action="store", type="float",           dest="dispense_time",                       default="500",                      help="Length of Dot Dispense (ms) applied to selected circles/ellipses")
         self.OptionParser.add_option("",   "--post-dot-dwell",                  action="store", type="float",           dest="post_dot_dwell",                      default="500",                      help="Length of post dot dwell (ms) applied to selected circles/ellipses")
@@ -2320,7 +2320,7 @@ class path_gcode(inkex.Effect):
                     'Tool',
                     'Dispense Speed',
                     'Valve Off Distance',
-                    'Valve Delay',
+                    'Valve On Time',
                     'Dispense Height',
                 ]
 
@@ -2663,7 +2663,7 @@ class path_gcode(inkex.Effect):
                 if lg == "G00":
                     g += "G01" + tool_off + c([None,None,s[5][0]+depth]) + travel_speed + " ;Penetrate\n\n"
                     g += dry + 'M98 P"' + tool + '_ON.G" ;Tool On\n'
-                    g += 'G04 P' + path[j].get('valve_delay') + " ;Valve Delay ms\n\n"
+                    g += 'G04 P' + path[j].get('valve_on_time') + " ;Valve On Time ms\n\n"
 
                 if curve[i][1] != 'end':
                     start_point = si[0]
@@ -2685,7 +2685,7 @@ class path_gcode(inkex.Effect):
                 if lg == "G00":
                     g += "G01" + c([None,None,s[5][0]+depth]) + travel_speed + " ;Penetrate\n\n"
                     g += dry + 'M98 P"' + tool + '_ON.G" ;Tool On\n'
-                    g += 'G04 P' + path[j].get('valve_delay') + " ;Valve Delay ms\n\n"
+                    g += 'G04 P' + path[j].get('valve_on_time') + " ;Valve On Time ms\n\n"
                 if (r[0]**2 + r[1]**2)>.1 : # self.options.min_arc_radius**2:
                     r1, r2 = (P(s[0])-P(s[2])), (P(si[0])-P(s[2]))
                     if abs(r1.mag()-r2.mag()) < 0.001 :
@@ -2968,7 +2968,7 @@ class path_gcode(inkex.Effect):
                     "Line ID": l.get("id"),
                     "Tool": l.get("tool"),
                     "Dispense Speed": l.get("dispense_speed"),
-                    "Valve Delay": l.get("valve_delay"),
+                    "Valve On Time": l.get("valve_on_time"),
                     "Valve Off Distance": l.get("valve_off_distance"),
                     "Dispense Height": l.get("dispense_height"),
                 }
@@ -3179,7 +3179,7 @@ class path_gcode(inkex.Effect):
                 else:
                     path_object.set('dispense_speed', str(round(self.options.dispense_speed,prec))) # set dispense speed
                     path_object.set('valve_off_distance', str(round(self.options.valve_off_distance,prec))) # set valve_off_distance
-                    path_object.set('valve_delay', str(round(self.options.valve_delay,prec)))       # set valve delay
+                    path_object.set('valve_on_time', str(round(self.options.valve_on_time,prec)))       # set valve on time
 
 
 ################################################################################
@@ -3203,7 +3203,7 @@ class path_gcode(inkex.Effect):
                 'ID': po.get('id'),
                 'Tool': po.get('tool'),
                 'Dispense Speed': po.get('dispense_speed'),
-                'Valve Delay': po.get('valve_delay'),
+                'Valve On Time': po.get('valve_on_time'),
                 'Dispense Height': po.get('dispense_height'),
             }
 

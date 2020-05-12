@@ -23,7 +23,11 @@
 
       <!-- Layer Settings Tab -->
       <page name="layer-settings" _gui-text="Layer Settings">
-         <_param name="layer-help" type="description" xml:space="preserve">Applies the following settings to the selected layer.</_param>
+         <_param name="layer-help" type="description" xml:space="preserve">- Applies the following settings to the selected layer.
+- Displays the current layer settings.
+- Hides the layer settings.
+- Imports the settings from the displayed layer settings to
+   that layer.</_param>
          <param name="layer-action" type="enum" _gui-text="Action">
             <_item value="layer-set">Set Layer Settings</_item>
             <_item value="layer-display">Display Layer Settings</_item>
@@ -43,7 +47,7 @@
          <_param name="line-settings" type="description" xml:space="preserve">Line Specific Settings:</_param>
          <param name="dispense-speed" type="float" precision="4" min="0" max="20000" _gui-text="Dispense Speed (mm/min):">750</param>
          <param name="valve-off-distance" type="float" precision="4" min="0" max="10" _gui-text="Valve Off Distance (mm)">0</param>	
-         <param name="valve-delay" type="float" precision="4" min="0" max="10000" _gui-text="Valve Delay (ms)">0</param>
+         <param name="valve-on-time" type="float" precision="4" min="0" max="10000" _gui-text="Valve On Time (ms)">0</param>
          <_param name="dot-settings" type="description" xml:space="preserve">Dot Specific Settings:</_param>
          <param name="dispense-time" type="float" precision="4" min="0" max="10000" _gui-text="Dispense Dot Time (ms)">500</param>
          <param name="post-dot-dwell" type="float" precision="4" min="0" max="10000" _gui-text="Post Dot Dwell (ms)">500</param>
@@ -52,13 +56,8 @@
       <!-- Help/Description Tab -->
       <page name="pva-about" _gui-text="About">
          <_param name="help_text" type="description" xml:space="preserve">
-PVA Gcode Generator
+
 Version: 1.0.0
-Last Updated: 05/05/2020
-
-
-PVA Contact Information
-www.pva.net
          </_param>
       </page>
 
